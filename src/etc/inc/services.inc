@@ -2371,6 +2371,7 @@ function dyndnsCheckIP($int) {
 		}
 
 		$hosttocheck = $url;
+		$frag = urldecode(parse_url($url, PHP_URL_FRAGMENT));
 		$ip_ch = curl_init($hosttocheck);
 		curl_setopt($ip_ch, CURLOPT_RETURNTRANSFER, 1);
 		curl_setopt($ip_ch, CURLOPT_SSL_VERIFYPEER, $verifysslpeer);
@@ -2386,17 +2387,13 @@ function dyndnsCheckIP($int) {
 		$ip_result_page = curl_exec($ip_ch);
 		curl_close($ip_ch);
 		$ip_result_decoded = urldecode($ip_result_page);
-		preg_match('=Current IP Address: (.*)</body>=siU', $ip_result_decoded, $matches);
+		// If no provider-specified regex, just match an IPv4 address
+		preg_match($frag ? $frag : '=((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])=', $ip_result_decoded, $matches);
 
 		if ($matches[1]) {
-			$parsed_ip = trim($matches[1]);
+			$ip_address = trim($matches[1]);
 		} else {
-			$parsed_ip = trim($ip_result_decoded);
-		}
-
-		preg_match('=((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])=', $parsed_ip, $matches);
-		if ($matches[0]) {
-			$ip_address = $matches[0];
+			$ip_address = trim($ip_result_decoded);
 		}
 	}
 	return $ip_address;
