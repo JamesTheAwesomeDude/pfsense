@@ -2386,14 +2386,13 @@ function dyndnsCheckIP($int) {
 		}
 		$ip_result_page = curl_exec($ip_ch);
 		curl_close($ip_ch);
-		$ip_result_decoded = urldecode($ip_result_page);
 		// If no provider-specified regex, just match an IPv4 address
-		preg_match($frag ? $frag : '=((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])=', $ip_result_decoded, $matches);
+		preg_match($frag ? $frag : '=((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])=', $ip_result_page, $matches);
 
 		if ($matches[1]) {
 			$ip_address = trim($matches[1]);
 		} else {
-			$ip_address = trim($ip_result_decoded);
+			$ip_address = trim($ip_result_page);
 		}
 	}
 	return $ip_address;
